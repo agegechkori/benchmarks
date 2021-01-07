@@ -3,35 +3,39 @@ use clap::Clap;
 #[derive(Clap)]
 #[clap(
     name = "primes_sieve",
-    about = "prints the number of prime numbers not greater than the given number"
+    about = "counts the prime numbers not greater than the given number"
 )]
 struct Options {
     #[clap(short, long, about = "print discovered prime numbers")]
     debug: bool,
-    #[clap(about = "find all the prime numbers not greater than this one")]
-    number: usize,
+    #[clap(about = "upper bound for the prime numbers search")]
+    upper_bound: usize,
 }
 
 fn main() {
     let opts = Options::parse();
-    let primes = find_prime_numnbers(opts.number);
-    println!("Primes in the range: {}", primes.len());
+    let primes = find_prime_numnbers(opts.upper_bound);
+    println!(
+        "Found {} prime numbers not greater than {}",
+        primes.len(),
+        opts.upper_bound
+    );
     if opts.debug {
         println!("{:#?}", primes);
     }
 }
 
-fn find_prime_numnbers(number: usize) -> Vec<usize> {
-    let sieve = create_sieve_of_eratosthenes(number);
+fn find_prime_numnbers(upper_bound: usize) -> Vec<usize> {
+    let sieve = create_sieve_of_eratosthenes(upper_bound);
     return select_prime_numbers(sieve);
 }
 
-fn create_sieve_of_eratosthenes(number: usize) -> Vec<bool> {
-    let mut sieve = vec![true; number + 1];
-    let number_sqrt = (number as f64).sqrt() as usize;
-    for i in 2..=number_sqrt {
+fn create_sieve_of_eratosthenes(upper_bound: usize) -> Vec<bool> {
+    let mut sieve = vec![true; upper_bound + 1];
+    let upper_bound_integer_sqrt = (upper_bound as f64).sqrt() as usize;
+    for i in 2..=upper_bound_integer_sqrt {
         if sieve[i] {
-            for j in (i * i..=number).step_by(i) {
+            for j in (i * i..=upper_bound).step_by(i) {
                 sieve[j] = false;
             }
         }
